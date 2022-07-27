@@ -9,17 +9,11 @@ use core\base\settings\ShopSettings;
 /* ----------- контроллер обработки адресной строки. Формирование маршрутов ------- */
 //Разбирает адрессную строку по параметрам
 
-class RouteController
+class RouteController extends BaseController
 {
   static private $_instance; // Синглтон
 
   protected $routes;
-
-  protected $controller;
-  protected $inputMethod;
-  protected $outputMethod;
-  protected $parameters;
-
 
   private function __clone()
   {
@@ -49,12 +43,14 @@ class RouteController
       $this->routes = Settings::get('routes'); // Маршруты
       if (!$this->routes) throw new RouteException('Сайт находится на техническом обслуживании');
 
+      $url = explode('/', substr($adress_str, strlen(PATH)));
+
       /* Проверка на путь к админ панели в адресной строке*/
-      if (strpos($adress_str, $this->routes['admin']['alias']) === strlen(PATH)) {
+      if ($url[0] && $url[0] === $this->routes['admin']['alias']) {
 
         /* Админка */
+        array_shift($url);
 
-        $url = explode('/', substr($adress_str, strlen(PATH . $this->routes['admin']['alias']) + 1));
         /* Не лежит ли обращение к плагину в нулевом элементе */
         if ($url[0] && is_dir($_SERVER['DOCUMENT_ROOT'] . PATH . $this->routes['plugins']['path'] . $url[0])) {
           /* Если условие выполнилось, значит буду детать что-то для плагина, если нет, то мы попадём в админку */
@@ -80,7 +76,6 @@ class RouteController
         }
       } else {
         /* Пользовательская часть */
-        $url = explode('/', substr($adress_str, strlen(PATH)));
 
         /* Тут система поймёт, ей работать с человекочитаемым адресом или нет */
         $hrUrl = $this->routes['user']['hrUrl'];

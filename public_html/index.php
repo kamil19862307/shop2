@@ -13,8 +13,8 @@ use core\base\controller\RouteController; //Контроллер
 
 try {
   /* singleton контроллер */
-  // RouteController::getInstance()->route();
-  RouteController::getInstance();
+  RouteController::getInstance()->route();
+  // RouteController::getInstance();
 } catch (RouteException $e) {
   exit($e->getMessage());
 }
